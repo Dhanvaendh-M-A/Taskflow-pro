@@ -1,0 +1,136 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 226 28% 97%;
+    --foreground: 226 8% 14%;
+    --card: 230 20% 100%;
+    --card-foreground: 226 8% 14%;
+    --popover: 226 25% 100%;
+    --popover-foreground: 226 8% 14%;
+    --primary: 241 88% 46%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 177 68% 41%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 227 16% 92%;
+    --muted-foreground: 227 18% 48%;
+    --accent: 330 82% 54%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 353 81% 61%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 223 14% 88%;
+    --input: 223 16% 94%;
+    --ring: 243 96% 78%;
+    --radius: 1rem;
+  }
+
+  .dark {
+    --background: 232 24% 9%;
+    --foreground: 210 16% 96%;
+    --card: 232 18% 15%;
+    --card-foreground: 210 16% 96%;
+    --popover: 232 18% 16%;
+    --popover-foreground: 210 16% 96%;
+    --primary: 243 90% 67%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 177 82% 52%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 232 18% 18%;
+    --muted-foreground: 215 18% 74%;
+    --accent: 330 85% 61%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 353 82% 65%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 232 18% 19%;
+    --input: 232 18% 20%;
+    --ring: 247 92% 74%;
+  }
+}
+
+@layer base {
+  * {
+    border-color: hsl(var(--border));
+  }
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    background-image: radial-gradient(circle at top left, hsla(241, 88%, 46%, 0.08), transparent 30%), radial-gradient(circle at bottom right, hsla(177, 68%, 41%, 0.08), transparent 30%);
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: hsla(226, 16%, 93%, 0.8);
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(241, 88%, 46%, 0.45);
+  border-radius: 9999px;
+  border: 2px solid hsla(226, 16%, 93%, 0.8);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsla(241, 88%, 46%, 0.65);
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 12s ease infinite;
+}
+
+.glass-effect {
+  backdrop-filter: blur(24px) saturate(210%);
+  background-color: hsla(226, 28%, 100%, 0.55);
+  border: 1px solid hsla(223, 14%, 88%, 0.35);
+  box-shadow: 0 24px 80px -40px rgba(44, 55, 84, 0.35);
+}
+
+.dark .glass-effect {
+  background-color: hsla(232, 18%, 17%, 0.64);
+  border-color: hsla(232, 18%, 30%, 0.28);
+}
+
+.task-card {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+}
+
+task-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 28px 90px -50px rgba(16, 24, 40, 0.35);
+}
+
+.task-card {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.3);
+}
+
+.priority-urgent { border-left: 3px solid #ef4444; }
+.priority-high { border-left: 3px solid #f97316; }
+.priority-medium { border-left: 3px solid #eab308; }
+.priority-low { border-left: 3px solid #22c55e; }
+
+.status-todo { background: hsla(215, 20%, 65%, 0.2); color: hsl(215, 20%, 65%); }
+.status-in_progress { background: hsla(217, 91%, 60%, 0.2); color: hsl(217, 91%, 60%); }
+.status-in_review { background: hsla(280, 65%, 60%, 0.2); color: hsl(280, 65%, 60%); }
+.status-done { background: hsla(142, 71%, 45%, 0.2); color: hsl(142, 71%, 45%); }
+.status-cancelled { background: hsla(0, 84%, 60%, 0.2); color: hsl(0, 84%, 60%); }
+
+.skeleton {
+  background: hsl(var(--muted));
+  background-size: 100% 100%;
+}
