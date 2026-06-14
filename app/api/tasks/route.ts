@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
+    // Get tasks where user is creator or assigned
     const assignedTaskIds = await TaskAssignment.find({ userId }).distinct("taskId");
     const userProjectIds = await TeamMember.find({ userId }).distinct("projectId");
 
@@ -63,16 +64,6 @@ export async function GET(request: NextRequest) {
       ];
       delete query.$or;
     }
-
-    // Get tasks where user is creator or assigned
-    const assignedTaskIds = await TaskAssignment.find({ userId }).distinct("taskId");
-    const userProjectIds = await TeamMember.find({ userId }).distinct("projectId");
-
-    query.$or = [
-      { creatorId: userId },
-      { _id: { $in: assignedTaskIds } },
-      { projectId: { $in: userProjectIds } },
-    ];
 
     const tasks = await Task.find(query)
       .populate("projectId", "name color")
