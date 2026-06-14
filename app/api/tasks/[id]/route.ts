@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -16,7 +16,8 @@ export async function GET(
     }
 
     await connectDB();
-    const task = await Task.findById(params.id)
+    const { id } = await params;
+    const task = await Task.findById(id)
       .populate("projectId", "id name color")
       .populate("creatorId", "id name image")
       .lean();
@@ -59,7 +60,7 @@ export async function GET(
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -68,6 +69,7 @@ export async function PATCH(
     }
 
     await connectDB();
+    const { id } = await params;
     const body = await request.json();
     const updateData: any = {};
 
@@ -83,7 +85,7 @@ export async function PATCH(
     if (body.estimatedHours !== undefined) updateData.estimatedHours = body.estimatedHours;
     if (body.actualHours !== undefined) updateData.actualHours = body.actualHours;
 
-    const task = await Task.findByIdAndUpdate(params.id, updateData, { new: true })
+    const task = await Task.findByIdAndUpdate(id, updateData, { new: true })
       .populate("projectId", "name color")
       .populate("creatorId", "name image")
       .lean();
@@ -115,7 +117,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -124,7 +126,8 @@ export async function DELETE(
     }
 
     await connectDB();
-    const task = await Task.findByIdAndDelete(params.id).lean();
+    const { id } = await params;
+    const task = await Task.findByIdAndDelete(id).lean();
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
