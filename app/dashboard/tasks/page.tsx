@@ -293,12 +293,17 @@ function TaskCard({
               )}
             </div>
             <div className="flex items-center gap-2">
-              {task._count?.comments > 0 && (
-                <span className="flex items-center gap-1">
-                  <MessageSquare className="h-3 w-3" />
-                  {task._count.comments}
-                </span>
-              )}
+              {(() => {
+                const commentCount = task._count?.comments ?? 0;
+                return (
+                  commentCount > 0 && (
+                    <span className="flex items-center gap-1">
+                      <MessageSquare className="h-3 w-3" />
+                      {commentCount}
+                    </span>
+                  )
+                );
+              })()}
             </div>
           </div>
 

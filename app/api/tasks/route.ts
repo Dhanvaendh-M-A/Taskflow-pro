@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
 
     const userId = new mongoose.Types.ObjectId(session.user.id);
 
+    // Get tasks where user is creator or assigned
     const assignedTaskIds = await TaskAssignment.find({ userId }).distinct("taskId");
     const userProjectIds = await TeamMember.find({ userId }).distinct("projectId");
 
@@ -64,38 +65,28 @@ export async function GET(request: NextRequest) {
       delete query.$or;
     }
 
-    // Get tasks where user is creator or assigned
-    const assignedTaskIds = await TaskAssignment.find({ userId }).distinct("taskId");
-    const userProjectIds = await TeamMember.find({ userId }).distinct("projectId");
-
-    query.$or = [
-      { creatorId: userId },
-      { _id: { $in: assignedTaskIds } },
-      { projectId: { $in: userProjectIds } },
-    ];
-
     const tasks = await Task.find(query)
       .populate("projectId", "name color")
       .populate("creatorId", "name image")
       .sort({ priority: -1, createdAt: -1 })
-      .lean();
+      .lean() as any[];
 
     // Get assignments for each task
-    const taskIds = tasks.map((t) => t._id);
+    const taskIds = tasks.map((t: any) => t._id);
     const assignments = await TaskAssignment.find({ taskId: { $in: taskIds } })
       .populate("userId", "name image")
-      .lean();
+      .lean() as any[];
 
-    const tasksWithAssignments = tasks.map((task) => ({
+    const tasksWithAssignments = tasks.map((task: any) => ({
       ...task,
-      id: task._id.toString(),
+      id: (task._id as mongoose.Types.ObjectId).toString(),
       project: task.projectId,
       creator: task.creatorId,
       projectId: task.projectId?._id?.toString() || task.projectId,
       creatorId: task.creatorId?._id?.toString() || task.creatorId,
       assignments: assignments
-        .filter((a) => a.taskId.toString() === task._id.toString())
-        .map((a) => ({ user: { ...a.userId, id: a.userId._id.toString() } })),
+        .filter((a: any) => a.taskId.toString() === (task._id as mongoose.Types.ObjectId).toString())
+        .map((a: any) => ({ user: { ...a.userId, id: (a.userId._id as mongoose.Types.ObjectId).toString() } })),
       _count: { subtasks: 0, comments: 0 },
     }));
 
@@ -152,12 +143,16 @@ export async function POST(request: NextRequest) {
     const populatedTask = await Task.findById(task._id)
       .populate("projectId", "name color")
       .populate("creatorId", "name image")
-      .lean();
+      .lean() as any;
+
+    if (!populatedTask) {
+      return NextResponse.json({ error: "Task not found after creation" }, { status: 500 });
+    }
 
     return NextResponse.json(
       {
         ...populatedTask,
-        id: populatedTask._id.toString(),
+        id: (populatedTask._id as mongoose.Types.ObjectId).toString(),
         project: populatedTask.projectId,
         creator: populatedTask.creatorId,
         assignments: [],

@@ -1,9 +1,11 @@
+import type { JWT } from "next-auth/jwt";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import connectDB from "./mongodb";
 import { User } from "./models";
+import type { IUser } from "./models";
 
 export const authOptions: NextAuthOptions = {
   // ensure a secret is present (required by Auth.js). For production, set NEXTAUTH_SECRET.
@@ -28,7 +30,6 @@ export const authOptions: NextAuthOptions = {
   },
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
     error: "/auth/error",
   },
   providers: [
@@ -43,7 +44,7 @@ export const authOptions: NextAuthOptions = {
 
         await connectDB();
 
-        const user = await User.findOne({ email: credentials.email }).lean();
+        const user = await User.findOne({ email: credentials.email }).lean<IUser | null>();
 
         if (!user || !user.password) return null;
 
@@ -69,10 +70,10 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === "github" || account?.provider === "google") {
         await connectDB();
-        const existingUser = await User.findOne({ email: user.email });
+        const existingUser = await User.findOne({ email: user.email }).lean<IUser | null>();
 
         if (!existingUser) {
           await User.create({
@@ -92,7 +93,7 @@ export const authOptions: NextAuthOptions = {
       }
       if (account?.provider === "github" || account?.provider === "google") {
         await connectDB();
-        const dbUser = await User.findOne({ email: token.email }).lean();
+        const dbUser = await User.findOne({ email: token.email as string }).lean<IUser | null>();
         if (dbUser) {
           token.id = dbUser._id.toString();
           token.role = dbUser.role;
@@ -101,7 +102,10 @@ export const authOptions: NextAuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) {
+      if (!session.user) {
+        session.user = {} as any;
+      }
+      if (token?.id) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
       }

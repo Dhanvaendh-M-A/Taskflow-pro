@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
-import { Task, TaskAssignment, TeamMember, ActivityLog } from "@/lib/models";
+import { Task, TaskAssignment, TeamMember, ActivityLog, type IActivityLog } from "@/lib/models";
 import mongoose from "mongoose";
 
 export async function GET() {
@@ -60,7 +60,14 @@ export async function GET() {
         .populate("userId", "name image")
         .sort({ createdAt: -1 })
         .limit(10)
-        .lean(),
+        .lean() as unknown as Array<{
+          _id: mongoose.Types.ObjectId;
+          userId: { _id: mongoose.Types.ObjectId; name?: string; image?: string };
+          action: string;
+          description: string;
+          metadata?: string;
+          createdAt: Date;
+        }>,
     ]);
 
     const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;

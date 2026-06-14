@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/mongodb";
-import { Notification } from "@/lib/models";
+import { Notification, type INotification } from "@/lib/models";
 import mongoose from "mongoose";
 
 export async function GET(request: NextRequest) {
@@ -23,7 +23,14 @@ export async function GET(request: NextRequest) {
     const notifications = await Notification.find(query)
       .sort({ createdAt: -1 })
       .limit(50)
-      .lean();
+      .lean() as unknown as Array<{
+        _id: mongoose.Types.ObjectId;
+        userId: mongoose.Types.ObjectId;
+        type: string;
+        message: string;
+        read: boolean;
+        createdAt: Date;
+      }>;
 
     const unreadCount = await Notification.countDocuments({ userId, read: false });
 
