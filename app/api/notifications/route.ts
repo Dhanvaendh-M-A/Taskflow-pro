@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const unreadCount = await Notification.countDocuments({ userId, read: false });
 
     return NextResponse.json({
-      notifications: notifications.map((n) => ({ ...n, id: n._id.toString() })),
+      notifications: notifications.map((n: any) => ({ ...n, id: (n._id as mongoose.Types.ObjectId).toString() })),
       unreadCount,
     });
   } catch (error) {
