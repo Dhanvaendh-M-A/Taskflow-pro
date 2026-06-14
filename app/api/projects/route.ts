@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
 
     const populatedProject = await Project.findById(project._id)
       .populate("ownerId", "name image")
-      .lean();
+      .lean() as any;
 
     if (!populatedProject) {
       return NextResponse.json({ error: "Project not found after creation" }, { status: 500 });
