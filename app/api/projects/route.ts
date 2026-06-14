@@ -46,15 +46,14 @@ export async function GET(request: NextRequest) {
 
     // Get counts for each project
     const projectsWithCounts = await Promise.all(
-      projects.map(async (project) => {
+      projects.map(async (project: any) => {
         const taskCount = await Task.countDocuments({ projectId: project._id });
         const memberCount = await TeamMember.countDocuments({ projectId: project._id });
-        const owner = project.ownerId;
         return {
           ...project,
-          id: project._id.toString(),
-          owner: { ...owner, id: owner._id.toString() },
-          ownerId: owner._id.toString(),
+          id: (project._id as mongoose.Types.ObjectId).toString(),
+          owner: { ...project.ownerId, id: (project.ownerId._id as mongoose.Types.ObjectId).toString() },
+          ownerId: (project.ownerId._id as mongoose.Types.ObjectId).toString(),
           _count: { tasks: taskCount, teamMembers: memberCount },
         };
       })
@@ -116,13 +115,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Project not found after creation" }, { status: 500 });
     }
 
-    const owner = populatedProject.ownerId;
-
     return NextResponse.json(
       {
         ...populatedProject,
-        id: populatedProject._id.toString(),
-        owner: { ...owner, id: owner._id.toString() },
+        id: (populatedProject._id as mongoose.Types.ObjectId).toString(),
+        owner: { ...populatedProject.ownerId, id: (populatedProject.ownerId._id as mongoose.Types.ObjectId).toString() },
         _count: { tasks: 0, teamMembers: 1 },
       },
       { status: 201 }
