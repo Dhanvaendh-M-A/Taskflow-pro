@@ -73,10 +73,10 @@ export async function GET() {
       const dayStr = dayDate.toISOString().split("T")[0];
 
       const completed = weeklyTasks.filter(
-        (t) => t.completedAt && t.completedAt.toISOString().split("T")[0] === dayStr
+        (t: any) => t.completedAt && t.completedAt.toISOString().split("T")[0] === dayStr
       ).length;
       const created = weeklyTasks.filter(
-        (t) => t.createdAt.toISOString().split("T")[0] === dayStr
+        (t: any) => t.createdAt.toISOString().split("T")[0] === dayStr
       ).length;
 
       return { day, completed, created };
@@ -88,13 +88,13 @@ export async function GET() {
       inProgressTasks,
       overdueTasks,
       completionRate,
-      tasksByStatus: tasksByStatus.map((t) => ({ status: t._id, count: t.count })),
-      tasksByPriority: tasksByPriority.map((t) => ({ priority: t._id, count: t.count })),
+      tasksByStatus: tasksByStatus.map((t: any) => ({ status: t._id, count: t.count })),
+      tasksByPriority: tasksByPriority.map((t: any) => ({ priority: t._id, count: t.count })),
       weeklyProgress: weeklyData,
-      recentActivity: recentActivity.map((a) => ({
+      recentActivity: recentActivity.map((a: any) => ({
         ...a,
-        id: a._id.toString(),
-        user: { ...a.userId, id: a.userId._id.toString() },
+        id: (a._id as mongoose.Types.ObjectId).toString(),
+        user: { ...a.userId, id: (a.userId._id as mongoose.Types.ObjectId).toString() },
       })),
     });
   } catch (error) {
