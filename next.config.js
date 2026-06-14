@@ -20,7 +20,7 @@ const nextConfig = {
     ];
   },
   env: {
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL || 'https://taskflow-pro.vercel.app',
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
   },
 };
