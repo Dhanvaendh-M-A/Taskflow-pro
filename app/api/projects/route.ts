@@ -93,6 +93,10 @@ export async function POST(request: NextRequest) {
       .populate("ownerId", "name image")
       .lean();
 
+    if (!populatedProject) {
+      return NextResponse.json({ error: "Project not found after creation" }, { status: 500 });
+    }
+
     return NextResponse.json(
       {
         ...populatedProject,
