@@ -20,7 +20,7 @@ export async function GET(
     const task = await Task.findById(id)
       .populate("projectId", "id name color")
       .populate("creatorId", "id name image")
-      .lean();
+      .lean() as any;
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
@@ -41,12 +41,12 @@ export async function GET(
 
     return NextResponse.json({
       ...task,
-      id: task._id.toString(),
+      id: (task._id as mongoose.Types.ObjectId).toString(),
       project: task.projectId,
       creator: task.creatorId,
-      assignments: assignments.map((a) => ({ user: { ...a.userId, id: a.userId._id.toString() } })),
-      subtasks: subtasks.map((st) => ({ ...st, id: st._id.toString() })),
-      comments: comments.map((c) => ({ ...c, id: c._id.toString(), user: { ...c.userId, id: c.userId._id.toString() } })),
+      assignments: assignments.map((a: any) => ({ user: { ...a.userId, id: (a.userId._id as mongoose.Types.ObjectId).toString() } })),
+      subtasks: subtasks.map((st: any) => ({ ...st, id: (st._id as mongoose.Types.ObjectId).toString() })),
+      comments: comments.map((c: any) => ({ ...c, id: (c._id as mongoose.Types.ObjectId).toString(), user: { ...c.userId, id: (c.userId._id as mongoose.Types.ObjectId).toString() } })),
       _count: {
         subtasks: subtasks.length,
         comments: comments.length,
@@ -88,7 +88,7 @@ export async function PATCH(
     const task = await Task.findByIdAndUpdate(id, updateData, { new: true })
       .populate("projectId", "name color")
       .populate("creatorId", "name image")
-      .lean();
+      .lean() as any;
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
@@ -105,7 +105,7 @@ export async function PATCH(
 
     return NextResponse.json({
       ...task,
-      id: task._id.toString(),
+      id: (task._id as mongoose.Types.ObjectId).toString(),
       project: task.projectId,
       creator: task.creatorId,
     });
@@ -127,7 +127,7 @@ export async function DELETE(
 
     await connectDB();
     const { id } = await params;
-    const task = await Task.findByIdAndDelete(id).lean();
+    const task = await Task.findByIdAndDelete(id).lean() as any;
 
     if (!task) {
       return NextResponse.json({ error: "Task not found" }, { status: 404 });
