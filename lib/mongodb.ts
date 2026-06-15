@@ -31,15 +31,26 @@ async function connectDB() {
       bufferCommands: false,
     };
 
-    cached!.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log("✅ MongoDB Connected");
-      return mongoose;
-    });
+    // Create the connection promise and attach logging for success/failure
+    cached!.promise = mongoose
+      .connect(MONGODB_URI, opts)
+      .then((mongoose) => {
+        console.log("✅ MongoDB Connected");
+        return mongoose;
+      })
+      .catch((err) => {
+        console.error("❌ MongoDB connection failed during initial connect:", err?.message || err);
+        // rethrow so the outer try/catch can handle it and reset the promise
+        throw err;
+      });
   }
 
   try {
     cached!.conn = await cached!.promise;
   } catch (e) {
+    // Log details before clearing cached promise so deployments show the root cause
+    console.error("MongoDB connection error:", e instanceof Error ? e.message : e);
+    if (e && (e as any).stack) console.error((e as any).stack);
     cached!.promise = null;
     throw e;
   }
